@@ -34,7 +34,7 @@ public class ConexionBbdd {
      * @throws IOException 
      */
     private void initializeRealtimeDatabase() throws IOException {
-        FileInputStream serviceAccount = new FileInputStream("firebaseAuth.json");//Fichero de configuración al proyecto firestore
+        FileInputStream serviceAccount = new FileInputStream("key.json");//Fichero de configuración al proyecto firestore
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .build();
@@ -45,7 +45,7 @@ public class ConexionBbdd {
     }
 
     public FirebaseDatabase getFirebaseDatabase() {
-        System.out.println("Coexión establcida");
+        System.out.println("Coexión establcida : " + firebaseDatabase);
         return firebaseDatabase;
     }
     /**
