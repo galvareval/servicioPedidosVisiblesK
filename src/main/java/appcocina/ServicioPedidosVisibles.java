@@ -89,7 +89,7 @@ public class ServicioPedidosVisibles extends TimerTask {
 
                             }
                         }*/
-                        //Prueba en 1 min
+                        //Prueba en 1 min; si ha pasado 1 min desde la fecha del pedido set editable == false
                         if (fechaPedido != null) {
                             // Calcular la diferencia de tiempo en minutos
                             long diferenciaMinutos = (currentTime - fechaPedido.getTime()) / (60 * 1000);
@@ -151,32 +151,31 @@ public class ServicioPedidosVisibles extends TimerTask {
      * @param pedido
      */
     private void enviarCorreoElectronico(Pedido pedido, String idPedido) {
-        // Credenciales del remitente
+        // Credenciales 
         final String correoRemitente = "appcocinaestella@gmail.com";
-        final String contraseña = "bbcadricalhnvlne";
+        final String contraseña = "bbcadricalhnvlne";//Constraseña de aplicacion
         // Configurar las propiedades del servidor de correo electrónico
-        
         Properties props = System.getProperties();
-        
-        props.put("mail.smtp.host", "smtp.gmail.com");  //El servidor SMTP de Google
         props.put("mail.smtp.user", correoRemitente);
-        props.put("mail.smtp.clave", contraseña);    //La clave de la cuenta
-        props.put("mail.smtp.auth", "true");    //Usar autenticación mediante usuario y clave
-        props.put("mail.smtp.starttls.enable", "true"); //Para conectar de manera segura al
-        props.put("mail.smtp.port", "587"); //El puerto SMTP seguro de Google
+        props.put("mail.smtp.clave", contraseña);    
+        //Config gmail
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.port", "465");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-        props.put("mail.smtp.ssl.ciphersuites", "TLS_AES_128_GCM_SHA256");
 
-        // Crear una sesión de correo electrónico
+        // Crear  sesión de correo 
         Session session = Session.getDefaultInstance(props);
 
         try {
-            // Crear un mensaje de correo electrónico
+            // Mensaje de correo electrónico
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(correoRemitente));
-            message.setSubject("Pedido: " + idPedido + " recibido");
+            message.setSubject("Pedido recibido: " + idPedido );
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(correoRemitente));
-            message.setText("Puedes comezar a gestionar el pedido " + pedido.toString());
+            message.setText("Puedes comezar a gestionar el pedido/n " + pedido.toString());
             Transport transport = session.getTransport("smtp");
             transport.connect("smtp.gmail.com", correoRemitente, contraseña);
             transport.sendMessage(message, message.getAllRecipients());
@@ -186,7 +185,7 @@ public class ServicioPedidosVisibles extends TimerTask {
             System.out.println("Correo electrónico enviado con éxito.");
         } catch (MessagingException e) {
             e.printStackTrace();
-            System.out.println("Error al enviar el correo electrónico.");
+            System.out.println("Error al enviar el correo electrónico." + e.getMessage());
         }
     }
 

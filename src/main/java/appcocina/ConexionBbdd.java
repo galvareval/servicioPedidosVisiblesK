@@ -45,7 +45,7 @@ public class ConexionBbdd {
     }
 
     public FirebaseDatabase getFirebaseDatabase() {
-        System.out.println("Coexión establcida : " + firebaseDatabase);
+        System.out.println("Coexión establcida a firebase ");
         return firebaseDatabase;
     }
     /**
