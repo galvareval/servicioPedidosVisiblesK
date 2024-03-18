@@ -12,6 +12,8 @@ package appcocina;
  * @author gianfranco
  */
 import com.google.firebase.database.*;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Notification;
 import java.io.IOException;
 
 import javax.mail.Authenticator;
@@ -38,7 +40,8 @@ import javax.mail.Transport;
 public class ServicioPedidosVisibles extends TimerTask {
 
     //conxión a firebase
-    private final DatabaseReference databaseReference;
+    private final DatabaseReference databaseReferencePedidos;
+    private final DatabaseReference databaseReferenceUsuarios;
     private ConexionBbdd conexion;
 
     public ServicioPedidosVisibles() {
@@ -48,7 +51,8 @@ public class ServicioPedidosVisibles extends TimerTask {
             Logger.getLogger(ServicioPedidosVisibles.class.getName()).log(Level.SEVERE, null, ex);
         }
         FirebaseDatabase database = conexion.getFirebaseDatabase();
-        databaseReference = database.getReference("pedidos");
+        databaseReferencePedidos = database.getReference("pedidos");
+        databaseReferenceUsuarios = database.getReference("usuarios");
 
     }
 
@@ -58,7 +62,7 @@ public class ServicioPedidosVisibles extends TimerTask {
         long currentTime = System.currentTimeMillis();
         System.out.println("Servicio en marcha se ejecutara cada hora");
         // Agregar un ValueEventListener a la referencia de la base de datos
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReferencePedidos.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -83,7 +87,7 @@ public class ServicioPedidosVisibles extends TimerTask {
                                 pedido.setEditable(false);
                                 String idPedido = pedidoSnapshot.getKey();
                                 // Actualizarlo en bbdd
-                                databaseReference.child(pedidoSnapshot.getKey()).setValue(pedido.toMap(),null);
+                                databaseReferencePedidos.child(pedidoSnapshot.getKey()).setValue(pedido.toMap(),null);
                                 System.out.println("El pedido ya no es editable");
                                 enviarCorreoElectronico(pedido,idPedido);
 
@@ -98,12 +102,19 @@ public class ServicioPedidosVisibles extends TimerTask {
                                 pedido.setEditable(false);
                                 String idPedido = pedidoSnapshot.getKey();
                                 // Actualizarlo en bbdd
-                                databaseReference.child(pedidoSnapshot.getKey()).setValue(pedido.toMap(), null);
+                                databaseReferencePedidos.child(pedidoSnapshot.getKey()).setValue(pedido.toMap(), null);
                                 System.out.println("El pedido: " + idPedido + " ya no es editable");
                                 enviarCorreoElectronico(pedido, idPedido);
                             }
                         }
 
+                    } else {
+                        if (pedido.getEstado().equals("recoger")) {
+                            System.out.println("Paso a enviar la notificacion");
+                            String idUsuario = pedido.getUsuario();
+                            String idPedido = pedidoSnapshot.getKey();
+                            enviarNotificacionRecoger(idUsuario, idPedido);
+                        }
                     }
                 }
             }
@@ -157,7 +168,7 @@ public class ServicioPedidosVisibles extends TimerTask {
         // Configurar las propiedades del servidor de correo electrónico
         Properties props = System.getProperties();
         props.put("mail.smtp.user", correoRemitente);
-        props.put("mail.smtp.clave", contraseña);    
+        props.put("mail.smtp.clave", contraseña);
         //Config gmail
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.auth", "true");
@@ -173,7 +184,7 @@ public class ServicioPedidosVisibles extends TimerTask {
             // Mensaje de correo electrónico
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(correoRemitente));
-            message.setSubject("Pedido recibido: " + idPedido );
+            message.setSubject("Pedido recibido: " + idPedido);
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(correoRemitente));
             message.setText("Puedes comezar a gestionar el pedido/n " + pedido.toString());
             Transport transport = session.getTransport("smtp");
@@ -187,6 +198,52 @@ public class ServicioPedidosVisibles extends TimerTask {
             e.printStackTrace();
             System.out.println("Error al enviar el correo electrónico." + e.getMessage());
         }
+    }
+    
+    /**
+     * Enviar notificacion de recoger al usuario
+     * @param idUsuario id del usuario
+     * @param idPedido  id del pedido
+     */
+    private void enviarNotificacionRecoger(String idUsuario, String idPedido) {
+        System.out.println("Evniar a :" + idUsuario);
+        databaseReferenceUsuarios.child(idUsuario).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //Obj Pedido encontrado a partir del Idpedido
+                Usuarios usuario = dataSnapshot.getValue(Usuarios.class);
+                System.out.println("Entro ondatachange");
+                if (usuario != null) {
+                    System.out.println("user: " + usuario.toString());
+                    String tokenNoti = usuario.getTokenNoti();
+                    System.out.println("Token: " + tokenNoti);
+                    String titulo = "Recoger pedido ";
+                    String cuerpo = "Por favor pasa a recoger tu pedido: " + idPedido.substring(3, 7);
+                    //Construir y enviar la noti
+                    Notification notification = Notification.builder()
+                            .setTitle(titulo)
+                            .setBody(cuerpo)
+                            .build();
+                    com.google.firebase.messaging.Message message = com.google.firebase.messaging.Message.builder()
+                            .setToken(tokenNoti)
+                            .setNotification(notification)
+                            .build();
+                    try {
+                        String response = FirebaseMessaging.getInstance().send(message);
+                        System.out.println("Mensaje enviado : " + response);
+                    } catch (Exception e) {
+                        System.err.println("Error al enviar el mensaje: " + e.getMessage());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Manejar el error en caso de que ocurra
+                System.err.println("Error: " + databaseError.getMessage());
+            }
+        });
+
     }
 
 }
