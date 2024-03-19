@@ -69,6 +69,10 @@ public class ServicioPedidosVisibles extends TimerTask {
                 // Iterar sobre  pedidos
                 for (DataSnapshot pedidoSnapshot : dataSnapshot.getChildren()) {
                     Pedido pedido = pedidoSnapshot.getValue(Pedido.class);
+                    String idUsuario = pedido.getUsuario();
+                    String idPedido = pedidoSnapshot.getKey();
+                    String titulo = "Titulo de la notificación";
+                    String cuerpo = "mensaje de la notifiacion";
                     //System.out.println("Pedido encontrado" + pedidoSnapshot.getKey());
                     if (pedido != null && pedido.getEditable() == true) {
                         // Obtener la fecha del pedido en String
@@ -76,44 +80,41 @@ public class ServicioPedidosVisibles extends TimerTask {
                         //System.out.println("pedido editable == true encontrado: " + pedido.toString());
                         // Convertir la fecha del pedido a un tipo de dato apropiado (p. ej., Date)
                         Date fechaPedido = convertirStringAFecha(fechaPedidoStr);
-                        //Para cambiar el estado cunado pase de una hora
-                        /* if (fechaPedido != null) {
-                            // Calcular la diferencia de tiempo en horas
-                            long diferenciaHoras = (currentTime - fechaPedido.getTime()) / (60 * 60 * 1000);
-                            //System.out.println("la diferencia de horas es: " + diferenciaHoras);
 
-                            // Si la diferencia es mayor o igual que 1 hora, actualizar el campo "editable" del pedido a false
-                            if (diferenciaHoras >= 1) {
-                                pedido.setEditable(false);
-                                String idPedido = pedidoSnapshot.getKey();
-                                // Actualizarlo en bbdd
-                                databaseReferencePedidos.child(pedidoSnapshot.getKey()).setValue(pedido.toMap(),null);
-                                System.out.println("El pedido ya no es editable");
-                                enviarCorreoElectronico(pedido,idPedido);
-
-                            }
-                        }*/
                         //Prueba en 1 min; si ha pasado 1 min desde la fecha del pedido set editable == false
                         if (fechaPedido != null) {
                             // Calcular la diferencia de tiempo en minutos
+                            System.out.println("Fecha del pedido " + fechaPedido);
                             long diferenciaMinutos = (currentTime - fechaPedido.getTime()) / (60 * 1000);
-                            // Si la diferencia es mayor o igual que 2 minutos, actualizar el campo "editable" del pedido a false
-                            if (diferenciaMinutos >= 1) {
-                                pedido.setEditable(false);
-                                String idPedido = pedidoSnapshot.getKey();
-                                // Actualizarlo en bbdd
-                                databaseReferencePedidos.child(pedidoSnapshot.getKey()).setValue(pedido.toMap(), null);
-                                System.out.println("El pedido: " + idPedido + " ya no es editable");
-                                enviarCorreoElectronico(pedido, idPedido);
+                            
+                            System.out.println("Dif munutos" + diferenciaMinutos);
+                            switch ((int) diferenciaMinutos) {
+                                //Enviar notificacion cuando hallan pasado 30 mins desde el pedido
+                                case 30 :
+                                case 31 :
+                                    titulo = "Aviso sobre pedido";
+                                    cuerpo = "Aún dispones de 30 minutos para editar tu pedido: " + idPedido.substring(3, 7);
+                                    enviarNotificacion(idUsuario, idPedido, titulo, cuerpo);
+                                    break;
+                                //Enviar notificacion cuando hallan pasado 60 mins desde el pedido
+                                case 60:
+                                case 61:    
+                                    titulo = "Aviso sobre pedido";
+                                    cuerpo = "Le informamos de que ya no puede editar el siguiente pedido: " + idPedido.substring(3, 7);
+                                    enviarNotificacion(idUsuario, idPedido, titulo, cuerpo);
+                                    //actualizarEstado(pedido, pedidoSnapshot);Esto lo hacen desde WEB con scrip de python
+                                    break;
+                                default:
+                                    
+                                    break;
                             }
                         }
-
                     } else {
+                        //El pedido no es editable, enviar notificacion se puede recoger ya
                         if (pedido.getEstado().equals("recoger")) {
-                            System.out.println("Paso a enviar la notificacion");
-                            String idUsuario = pedido.getUsuario();
-                            String idPedido = pedidoSnapshot.getKey();
-                            enviarNotificacionRecoger(idUsuario, idPedido);
+                            titulo = "Recoger pedido ";
+                            cuerpo = "Por favor pasa a recoger tu pedido: " + idPedido.substring(3, 7);
+                            enviarNotificacion(idUsuario, idPedido, titulo, cuerpo);
                         }
                     }
                 }
@@ -134,7 +135,22 @@ public class ServicioPedidosVisibles extends TimerTask {
 
         //Temporizador para ejecutar el servicio cada hora
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(servicio, 0, 60000); // 3600000 milisegundos = 1 hora para probar 60000= que se ejecute cada minuto
+        timer.scheduleAtFixedRate(servicio, 0, 60000); // 3600000 milisegundos = 1 hora para probar 60000= que se ejecute cada minuto; en prod poner cada 45 
+    }
+
+    /**
+     * Actulizar a false el campo editable del peddido y enviar correo
+     *
+     * @param pedido Pedido que se va a actualizar
+     * @param pedidoSnapshot Datasnapshot del pedidot
+     */
+    private void actualizarEstado(Pedido pedido, DataSnapshot pedidoSnapshot) {
+        pedido.setEditable(false);
+        String idPedido = pedidoSnapshot.getKey();
+        // Actualizarlo en bbdd
+        databaseReferencePedidos.child(pedidoSnapshot.getKey()).setValue(pedido.toMap(), null);
+        System.out.println("El pedido: " + idPedido + " ya no es editable");
+        enviarCorreoElectronico(pedido, idPedido);
     }
 
     /**
@@ -145,7 +161,7 @@ public class ServicioPedidosVisibles extends TimerTask {
      * @return
      */
     private Date convertirStringAFecha(String fechaStr) {
-        SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         Date fechaFormat;
         try {
             fechaFormat = formatoFecha.parse(fechaStr);
@@ -199,26 +215,23 @@ public class ServicioPedidosVisibles extends TimerTask {
             System.out.println("Error al enviar el correo electrónico." + e.getMessage());
         }
     }
-    
+
     /**
-     * Enviar notificacion de recoger al usuario
-     * @param idUsuario id del usuario
-     * @param idPedido  id del pedido
+     * Enviar notificacion del usuario del pedido
+     *
+     * @param idUsuario Id del usuario
+     * @param idPedido Id del pedido
+     * @param titulo Titulo de la noticación
+     * @param cuerpo Cuerpo de la notifiación
      */
-    private void enviarNotificacionRecoger(String idUsuario, String idPedido) {
-        System.out.println("Evniar a :" + idUsuario);
+    private void enviarNotificacion(String idUsuario, String idPedido, String titulo, String cuerpo) {
         databaseReferenceUsuarios.child(idUsuario).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //Obj Pedido encontrado a partir del Idpedido
                 Usuarios usuario = dataSnapshot.getValue(Usuarios.class);
-                System.out.println("Entro ondatachange");
                 if (usuario != null) {
-                    System.out.println("user: " + usuario.toString());
                     String tokenNoti = usuario.getTokenNoti();
-                    System.out.println("Token: " + tokenNoti);
-                    String titulo = "Recoger pedido ";
-                    String cuerpo = "Por favor pasa a recoger tu pedido: " + idPedido.substring(3, 7);
                     //Construir y enviar la noti
                     Notification notification = Notification.builder()
                             .setTitle(titulo)
