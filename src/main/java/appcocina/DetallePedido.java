@@ -5,7 +5,7 @@
 package appcocina;
 
 /**
- *
+ *  Clase entidad de los detalles de un pedido
  * @author gianfranco
  */
 public class DetallePedido {

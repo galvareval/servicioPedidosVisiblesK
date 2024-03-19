@@ -5,7 +5,7 @@
 package appcocina;
 
 /**
- *
+ * Clae entidad de los usuario de appcicona
  * @author gianfranco
  */
 public class Usuarios {

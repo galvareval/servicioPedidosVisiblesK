@@ -5,9 +5,8 @@
 package appcocina;
 
 /**
- * Este servicio se ejecuta cada hora para establecer los pedidos a no
- * editables, false en el campo editable del pedido. Para aquellos pedidos que
- * hallan superado 1 hora desde que se hicieron
+ * Este servicio controla laas notificaciones de la app de cocina
+ * Dispone tambien de metodos para controlar los campos editables y un servicio de correo para enviar correos desdela cuenta de appcocina
  *
  * @author gianfranco
  */
@@ -31,9 +30,9 @@ import javax.mail.Session;
 import javax.mail.Transport;
 
 /**
- * Clase que implemnta el timer para que se ejecute cada hora, al tener el
+ * Clase que implemnta el timer para que se ejecute cada x tiempo, al tener el
  * listener ondatachange tambien se actuliza cada vez que se accede a la tabla
- * pedidos. Pero en caso de que no se acceda se ejecuta la logica pasda 1 hora.
+ * pedidos. Pero en caso de que no se acceda se ejecuta la logica pasdo x tiempo.
  *
  * @author gjalvarez
  */
@@ -44,6 +43,9 @@ public class ServicioPedidosVisibles extends TimerTask {
     private final DatabaseReference databaseReferenceUsuarios;
     private ConexionBbdd conexion;
 
+    /**
+     *Constructor del servicio
+     */
     public ServicioPedidosVisibles() {
         try {
             conexion = new ConexionBbdd();
@@ -56,6 +58,9 @@ public class ServicioPedidosVisibles extends TimerTask {
 
     }
 
+    /**
+     * Ejecución del servicio
+     */
     @Override
     public void run() {
         // Obtener la fecha y hora actual
@@ -66,28 +71,23 @@ public class ServicioPedidosVisibles extends TimerTask {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                // Iterar sobre  pedidos
+                // Iterar sobre  pedidos de la BBDD
                 for (DataSnapshot pedidoSnapshot : dataSnapshot.getChildren()) {
                     Pedido pedido = pedidoSnapshot.getValue(Pedido.class);
                     String idUsuario = pedido.getUsuario();
                     String idPedido = pedidoSnapshot.getKey();
                     String titulo = "Titulo de la notificación";
                     String cuerpo = "mensaje de la notifiacion";
-                    //System.out.println("Pedido encontrado" + pedidoSnapshot.getKey());
                     if (pedido != null && pedido.getEditable() == true) {
                         // Obtener la fecha del pedido en String
                         String fechaPedidoStr = pedido.getFecha_pedido();
-                        //System.out.println("pedido editable == true encontrado: " + pedido.toString());
-                        // Convertir la fecha del pedido a un tipo de dato apropiado (p. ej., Date)
+                        // Convertir la fecha del pedido 
                         Date fechaPedido = convertirStringAFecha(fechaPedidoStr);
-
-                        //Prueba en 1 min; si ha pasado 1 min desde la fecha del pedido set editable == false
                         if (fechaPedido != null) {
                             // Calcular la diferencia de tiempo en minutos
-                            System.out.println("Fecha del pedido " + fechaPedido);
+                            //System.out.println("Fecha del pedido " + fechaPedido); TODO quitar sout en prod
                             long diferenciaMinutos = (currentTime - fechaPedido.getTime()) / (60 * 1000);
-                            
-                            System.out.println("Dif munutos" + diferenciaMinutos);
+                            System.out.println("Dif munutos" + diferenciaMinutos);//TODO quitar sout en prod
                             switch ((int) diferenciaMinutos) {
                                 //Enviar notificacion cuando hallan pasado 30 mins desde el pedido
                                 case 30 :
@@ -102,7 +102,7 @@ public class ServicioPedidosVisibles extends TimerTask {
                                     titulo = "Aviso sobre pedido";
                                     cuerpo = "Le informamos de que ya no puede editar el siguiente pedido: " + idPedido.substring(3, 7);
                                     enviarNotificacion(idUsuario, idPedido, titulo, cuerpo);
-                                    //actualizarEstado(pedido, pedidoSnapshot);Esto lo hacen desde WEB con scrip de python
+                                    //actualizarEstado(pedido, pedidoSnapshot);Esto lo hacen desde WEB con scrip de python; Si se quiere hacer aqui descomentar
                                     break;
                                 default:
                                     
@@ -110,7 +110,7 @@ public class ServicioPedidosVisibles extends TimerTask {
                             }
                         }
                     } else {
-                        //El pedido no es editable, enviar notificacion se puede recoger ya
+                        //El pedido no es editable, enviar notificacion se puede recoger ya si el estado es recoger
                         if (pedido.getEstado().equals("recoger")) {
                             titulo = "Recoger pedido ";
                             cuerpo = "Por favor pasa a recoger tu pedido: " + idPedido.substring(3, 7);
@@ -127,15 +127,17 @@ public class ServicioPedidosVisibles extends TimerTask {
         });
 
     }
-
+    /**
+     * Metodo main ejecuta el servicio cada x tiempo
+     * @param args 
+     */
     public static void main(String[] args) {
 
         // Para arrancar servicio
         ServicioPedidosVisibles servicio = new ServicioPedidosVisibles();
-
-        //Temporizador para ejecutar el servicio cada hora
+        //Temporizador para ejecutar el servicio x tiempo
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(servicio, 0, 60000); // 3600000 milisegundos = 1 hora para probar 60000= que se ejecute cada minuto; en prod poner cada 45 
+        timer.scheduleAtFixedRate(servicio, 0, 60000); // 3600000 milisegundos = 1 hora para probar 60000= que se ejecute cada minuto; en prod poner cada 10 mns si hay sobrecarga 
     }
 
     /**
@@ -157,8 +159,8 @@ public class ServicioPedidosVisibles extends TimerTask {
      * Método para convertir un string de fecha en un objeto de fecha para hacer
      * las operaciones con las fechas
      *
-     * @param fechaStr
-     * @return
+     * @param fechaStr Cadena con la fecha del pedido
+     * @return Date tipo fecha
      */
     private Date convertirStringAFecha(String fechaStr) {
         SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -173,9 +175,9 @@ public class ServicioPedidosVisibles extends TimerTask {
     }
 
     /**
-     * Metodo para enviar el correo
-     *
-     * @param pedido
+     * Enviar el correo desde la cuenta de appcocina
+     * @param pedido Datos del pedido
+     * @param idPedido id del pedido
      */
     private void enviarCorreoElectronico(Pedido pedido, String idPedido) {
         // Credenciales 
