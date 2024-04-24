@@ -182,7 +182,7 @@ public class ServicioPedidosVisibles extends TimerTask {
     private void enviarCorreoElectronico(Pedido pedido, String idPedido) {
         // Credenciales 
         final String correoRemitente = "appcocinaestella@gmail.com";
-        final String contraseña = "bbcadricalhnvlne";//Constraseña de aplicacion
+        final String contraseña = "psw";//Constraseña de aplicacion
         // Configurar las propiedades del servidor de correo electrónico
         Properties props = System.getProperties();
         props.put("mail.smtp.user", correoRemitente);
