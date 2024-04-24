@@ -137,7 +137,7 @@ public class ServicioPedidosVisibles extends TimerTask {
         ServicioPedidosVisibles servicio = new ServicioPedidosVisibles();
         //Temporizador para ejecutar el servicio x tiempo
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(servicio, 0, 60000); // 3600000 milisegundos = 1 hora para probar 60000= que se ejecute cada minuto; en prod poner cada 10 mns si hay sobrecarga 
+        timer.scheduleAtFixedRate(servicio, 0, 3600000); // 3600000 milisegundos = 1 hora para probar 60000= que se ejecute cada minuto; en prod poner cada 10 mns si hay sobrecarga 
     }
 
     /**
