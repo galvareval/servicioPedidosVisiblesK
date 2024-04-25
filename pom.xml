@@ -3,15 +3,33 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>appcocina</groupId>
     <artifactId>servicioPedidosVisibles</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <exec.mainClass>appcocina.ServicioPedidosVisibles</exec.mainClass>
+      
         
     </properties>
+    <build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>2.1</version>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <addClasspath>true</addClasspath>
+                        <mainClass>appcocina.ServicioPedidosVisibles</mainClass>
+                    </manifest>
+                </archive>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
     <dependencies>
         <dependency>
             <groupId>com.google.firebase</groupId>
@@ -26,5 +44,7 @@
         </dependency>
 
     </dependencies>
-
+    <description>Aplicacion de notificciones</description>
+    <name>Snotificaciones</name>
+    
 </project>

@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"appcocina","l":"ConexionBbdd"},{"p":"appcocina","l":"DetallePedido"},{"p":"appcocina","l":"Pedido"},{"p":"appcocina","l":"ServicioPedidosVisibles"},{"p":"appcocina","l":"Usuarios"}];updateSearchResults();

@@ -15,8 +15,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Notification;
 import java.io.IOException;
 
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
