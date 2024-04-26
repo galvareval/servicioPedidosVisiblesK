@@ -9,7 +9,7 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
                     <archive>
@@ -17,9 +17,20 @@
                             <mainClass>appcocina.ServicioPedidosVisibles</mainClass>
                         </manifest>
                     </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-            
         </plugins>
     </build>
     <properties>
@@ -28,7 +39,12 @@
         <maven.compiler.target>21</maven.compiler.target>
         
     </properties>
-    
+    <repositories>
+        <repository>
+            <id>google</id>
+            <url>https://maven.google.com/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -42,9 +58,15 @@
             <artifactId>mail</artifactId>
             <version>1.4.7</version>
         </dependency>
-
+        
+       
     </dependencies>
     <description>Aplicacion de notificciones</description>
     <name>Snotificaciones</name>
+    
+
+
+
+
     
 </project>
