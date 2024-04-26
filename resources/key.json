@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "cocinaapp-7da53",
+  "private_key_id": "456bf0f51b48cd2b74dfb42473a1150d42821319",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCpy5Za512Q9VhS\nFz7xedHXJl5cfyq9MtwLxJsxZwUFumlo6ZCdnzXp4sBGV1CitE0Z3PjuOehXjjp6\njkxDmsUd0/88MuQ99YK1EcvWf24r/ON3PWpmG4DwQ0U3XNHs2HRo6FgHDDJuyhCH\nppII7w2KxO9LwzBZ6ptF2A7/3B8VQz4S+kBBeeSKHJ/gNtYs+kAl01ZXBWALxYhL\nErNyS9J8W03XdugO2RJT1yRJR+XLJWM0aB3vkVGHTu3HK58CuSNkcY33T50gSs9k\ndjymSwxtjADXq0GkBdN55RL8SUZu24gw7v5U3HyWZNjLuIg3ZDVw3V3IfMzXjGgx\nUZNW+kmlAgMBAAECggEAKBMGmtBh/zlEveVCJBSMH/MskLir0ek70aQ2u690mkA/\nqjT7/pOp0hiEKGXpwGj9DIZgkztEGMwXBb9phQg1jz9ujVr2jyAPmCRJ34eGbWfb\nmNQ8NTq3ER3Ta4hi/Hsu6Ga0Bf/NNGRJB/canvSq1c56qv83vXUXbiHbEmy1wlrQ\nenI7Fy0sxxl5obLw0rHKz8pTz+BL61CRJjTJ5LtHV0hp5AOoUhcv5BfGB/Uswk8f\nnIAU+ADTBSUNpc7zMlFj0uUnmOvWWhkHByKh4LHQc+p8NRiW9Oo58EVPCYOW3hml\nWFWqC1/5pFMSWFW+gtfup5Mo60ZpooPD6dZB+DiU0QKBgQDi6hy1P+a6XyAi/q2e\noiZNcHiwDTyJQ/ZyGqUFF8Q+hblt0p3s2hXUqek+m2kwZdrw12UCqo5pkmGshgX3\ngc5HNPE3lqiV6YYgzz4s941IJr81bBhRsX+LPt9FPcSUJRiab4S28rv7VLWIrLPS\n7COLm7Cz+9DpK5QmY/xUkY5f8QKBgQC/jy+RJd/HLbeSUtG8rlse3jtQQlffUqj9\n9GJPJnq3jNyaFOJgXxhAztJopfOEb2rlOwBtA/q1gtnNmwX32iX7Aql8g093j2xj\nAqPxF3uEONlQJWg2DSSh0Z3GLvxRTpThv5gs8XEvOy1J90VOvbaNmOq79OAkFndM\n5LZDgDf49QKBgQCwKa616/E1WWp6oJurnxj7X8jibLRFoLSwaw0YAhaBr5GAuFWQ\nrtLp8is5RrAIOdsaxS4PPtgnD9Syeq4hM+4wC+MFE/q3v784s4wCnwFZNXOWht/u\ndE2fjeUKPWTi2lXad59h5NqZyW7Rt7o3ksoZtXoekO3kR8fRcihQg1w0EQKBgQCy\n/mKeKFu/y/I6YfTlb65pW5Lk3fkqDh0mn5K1DumgVZlUyKr3DiSlehyV+GthlpK1\n+7ncI9nCfbBzNKYRAOB4efZRCIna2EOZCMCT6TNbS5uUDkAgMYvHQQ1CQGk4uErZ\n3qOda0YtsggRk2JJv2+zQ+4jDx/Z2LxFN3kv/cFPeQKBgEKrsqn7Ut6ieZqafo/2\nAXGSdZcNShH2Y1x4dhaeJw2LjrCdG/cID5ke9Yajc/J1vtBFqaxfWG7otEgq/PCR\nXsc+XCzrUBQBdyPPCA706f460gDm9GgCbh5pQbGHIbNzJZwZVDD1V5ruv6ApPTBa\n2ekYAOuQeTrXOLPN6OEun7C2\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-ftpe4@cocinaapp-7da53.iam.gserviceaccount.com",
+  "client_id": "104962675658542574109",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ftpe4%40cocinaapp-7da53.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
